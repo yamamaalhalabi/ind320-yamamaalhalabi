@@ -1,5 +1,5 @@
 import streamlit as st
 
-# Minimal working example
+# Front page (page 1)
 st.title("IND320 - Hjemmeside")
-st.write("Hello, Streamlit!")
+st.write("Bruk menyen til venstre for å navigere mellom sidene.")
