@@ -45,4 +45,4 @@ else:
     fig = px.line(subset, x=subset.index, y=column_choice, title=f"Reservoir data - {column_choice}")
 
 fig.update_layout(xaxis_title="Dato", yaxis_title="Verdi")
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
