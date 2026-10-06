@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Side 2 - Tabell")
+st.title("Page 2 - Table")
 
 @st.cache_data
 def load_data():

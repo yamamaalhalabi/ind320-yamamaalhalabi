@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.title("Side 3 - Plott")
+st.title("Page 3 - Plot")
 
 @st.cache_data
 def load_data():
@@ -27,10 +27,10 @@ df = load_data()
 months = df.index.to_period("M").unique()
 month_labels = [str(m) for m in months]
 
-column_choice = st.selectbox("Velg kolonne", options=["Alle"] + list(df.columns))
+column_choice = st.selectbox("Select column", options=["All"] + list(df.columns))
 
 start_label, end_label = st.select_slider(
-    "Velg periode (måneder)",
+    "Select period (months)",
     options=month_labels,
     value=(month_labels[0], month_labels[0]),
 )
@@ -39,10 +39,10 @@ start_time = pd.Period(start_label, freq="M").start_time
 end_time = pd.Period(end_label, freq="M").end_time
 subset = df.loc[start_time:end_time]
 
-if column_choice == "Alle":
-    fig = px.line(subset, x=subset.index, y=subset.columns, title="Reservoir data - alle kolonner")
+if column_choice == "All":
+    fig = px.line(subset, x=subset.index, y=subset.columns, title="Reservoir data - all columns")
 else:
     fig = px.line(subset, x=subset.index, y=column_choice, title=f"Reservoir data - {column_choice}")
 
-fig.update_layout(xaxis_title="Dato", yaxis_title="Verdi")
+fig.update_layout(xaxis_title="Date", yaxis_title="Value")
 st.plotly_chart(fig, width='stretch')
