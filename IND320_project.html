@@ -7802,10 +7802,9 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="IND320---Prosjektarbeid-Del-1">IND320 - Prosjektarbeid Del 1<a class="anchor-link" href="#IND320---Prosjektarbeid-Del-1">¶</a></h1><ul>
-<li><strong>GitHub Repository:</strong> <a href="https://github.com/yamamaalhalabi/ind320-yamamaalhalabi">https://github.com/yamamaalhalabi/ind320-yamamaalhalabi</a></li>
-<li><strong>Streamlit App:</strong> <a href="https://ind320-yamamaalhalabi.streamlit.app">https://ind320-yamamaalhalabi.streamlit.app</a></li>
-</ul>
+<h1 id="IND320---Project-Work-Part-1">IND320 - Project Work Part 1<a class="anchor-link" href="#IND320---Project-Work-Part-1">¶</a></h1><p><strong>Name:</strong> Yamama Alhalabi</p>
+<p><strong>GitHub repository:</strong> <a href="https://github.com/yamamaalhalabi/ind320-yamamaalhalabi">https://github.com/yamamaalhalabi/ind320-yamamaalhalabi</a></p>
+<p><strong>Streamlit app:</strong> <a href="https://ind320-yamamaalhalabi.streamlit.app/">https://ind320-yamamaalhalabi.streamlit.app/</a></p>
 </div>
 </div>
 </div>
@@ -7940,7 +7939,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Utskrift-av-innholdet">Utskrift av innholdet<a class="anchor-link" href="#Utskrift-av-innholdet">¶</a></h2>
+<h2 id="Printing-the-contents">Printing the contents<a class="anchor-link" href="#Printing-the-contents">¶</a></h2>
 </div>
 </div>
 </div>
@@ -8079,7 +8078,7 @@ Periode: 1995-01-08 til 2026-09-06
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Plott-av-hver-kolonne-separat">Plott av hver kolonne separat<a class="anchor-link" href="#Plott-av-hver-kolonne-separat">¶</a></h2>
+<h2 id="Plotting-each-column-separately">Plotting each column separately<a class="anchor-link" href="#Plotting-each-column-separately">¶</a></h2>
 </div>
 </div>
 </div>
@@ -8128,7 +8127,7 @@ Periode: 1995-01-08 til 2026-09-06
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Plott-av-alle-kolonner-sammen">Plott av alle kolonner sammen<a class="anchor-link" href="#Plott-av-alle-kolonner-sammen">¶</a></h2><p>Siden kolonnene har svært ulik skala (f.eks. <code>capacity_twh</code> rundt 87, mens <code>fill_ratio_change</code> er nær 0), normaliseres hver kolonne til samme skala (0-1) før de vises i samme graf. Dette gjør det mulig å sammenligne mønstrene i tid, selv om de faktiske verdiene er svært forskjellige.</p>
+<h2 id="Plotting-all-columns-together">Plotting all columns together<a class="anchor-link" href="#Plotting-all-columns-together">¶</a></h2><p>Since the columns have very different scales (e.g. <code>capacity_twh</code> is around 87, while <code>fill_ratio_change</code> is close to 0), each column is normalized to the same 0-1 scale before being shown in the same graph. This makes it possible to compare the patterns over time, even though the actual values differ greatly.</p>
 </div>
 </div>
 </div>
@@ -8179,12 +8178,12 @@ Periode: 1995-01-08 til 2026-09-06
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Logg">Logg<a class="anchor-link" href="#Logg">¶</a></h2><p>I dette prosjektet har jeg satt opp grunnstrukturen for et Streamlit-basert prosjektarbeid i IND320. Arbeidet startet med å opprette en offentlig GitHub-konto og et repository (ind320-yamamaalhalabi), etterfulgt av en Streamlit Cloud-konto koblet til samme GitHub-konto. Jeg lagde en minimal Streamlit-app med en enkel forsidetekst, pushet den til GitHub, og fikk den til å kjøre på ind320-yamamaalhalabi.streamlit.app. Deretter utvidet jeg appen til fire sider ved å bruke Streamlits automatiske sidebar-navigasjon: en forside, samt sidene Tabell, Plott og Om, hver med sin egen .py-fil i en pages-mappe.</p>
-<p>Underveis støtte jeg på en encoding-feil da PowerShell lagret en fil med norske tegn (å) i feil tegnsett, som ga en utf-8-feil i den kjørende appen. Dette løste jeg ved å spesifisere UTF-8-koding eksplisitt, og gikk deretter over til å redigere filene i VS Code i stedet for direkte i PowerShell, siden VS Code lagrer i UTF-8 som standard.</p>
-<p>Dataene i prosjektet er reservoirs.csv, hentet fra kursets GitHub-repository (khliland/IND320). Filen inneholder ukentlige tall for fyllingsgrad i norske vannmagasiner, brutt ned på flere regionnivåer (nasjonalt, elspotområder og vassdragsregioner). Jeg filtrerte dataene til kun det nasjonale nivået for å få én sammenhengende tidsserie per kolonne, og omdøpte kolonnene fra norske til engelske, forståelige navn (f.eks. fyllingsgrad til fill_ratio).</p>
-<p>I Jupyter Notebook leste jeg inn og renset dataene med Pandas, skrev ut grunnleggende statistikk med describe(), og laget to typer plott: ett med hver kolonne vist separat i egne delplott, og ett der alle kolonner vises sammen i én graf. Siden kolonnene har svært ulik skala (f.eks. kapasitet i TWh mot en endringsrate nær null), normaliserte jeg verdiene til et felles 0-1-intervall før de ble plottet sammen, slik at mønstrene kunne sammenlignes visuelt.</p>
-<p>På Streamlit-siden implementerte jeg en tabell på side 2 som viser hver kolonne som en egen rad, med en linjediagram-sparkline (LineChartColumn) som viser utviklingen gjennom den første måneden med data. På side 3 laget jeg et interaktivt plott med en nedtrekksmeny (selectbox) for å velge én enkelt kolonne eller alle kolonner samtidig, samt en select_slider for å velge hvilken tidsperiode (måneder) som skal vises i grafen.</p>
-<p>Gjennom hele prosessen har jeg brukt AI-verktøy til hjelp med feilsøking, kodestruktur og forklaringer av Streamlit- og Pandas-funksjonalitet, samt til å finne riktig plassering for kursets datafiler. Alt kode er testet både lokalt og i den skydeployerte Streamlit-appen for å bekrefte at det fungerer likt begge steder.</p>
+<h2 id="Log">Log<a class="anchor-link" href="#Log">¶</a></h2><p>In this project, I set up the basic structure for a Streamlit-based project in IND320. The work started by creating a public GitHub account and repository (ind320-yamamaalhalabi), followed by a Streamlit Cloud account connected to the same GitHub account. I built a minimal Streamlit app with a simple front-page text, pushed it to GitHub, and got it running at ind320-yamamaalhalabi.streamlit.app. I then expanded the app to four pages using Streamlit's automatic sidebar navigation: a front page, plus the pages Table, Plot, and About, each with its own .py file in a pages folder.</p>
+<p>Along the way, I encountered an encoding error when PowerShell saved a file containing Norwegian characters (å) in the wrong character set, causing a utf-8 error in the running app. I resolved this by specifying UTF-8 encoding explicitly, and then switched to editing files in VS Code instead of directly in PowerShell, since VS Code saves in UTF-8 by default.</p>
+<p>The data used in this project is reservoirs.csv, obtained from the course's GitHub repository (khliland/IND320). The file contains weekly figures for the fill level of Norwegian water reservoirs, broken down into several regional levels (national, electricity price areas, and watercourse regions). I filtered the data to the national level only, to get one continuous time series per column, and renamed the columns from Norwegian to understandable English names (e.g. fyllingsgrad to fill_ratio).</p>
+<p>In Jupyter Notebook, I read and cleaned the data using Pandas, printed basic statistics with describe(), and created two types of plots: one showing each column separately in its own subplot, and one showing all columns together in a single graph. Since the columns have very different scales (e.g. capacity in TWh versus a change rate close to zero), I normalized the values to a common 0-1 range before plotting them together, so the patterns could be compared visually.</p>
+<p>On the Streamlit side, I implemented a table on page 2 that shows each column as its own row, with a line-chart sparkline (LineChartColumn) showing the development over the first month of data. On page 3, I built an interactive plot with a dropdown menu (selectbox) to select either a single column or all columns at once, as well as a select_slider to choose which time period (months) to display in the graph.</p>
+<p>Throughout the process, I used AI tools to help with debugging, code structure, and explanations of Streamlit and Pandas functionality, as well as to locate the correct location for the course's data files. All code has been tested both locally and in the deployed Streamlit Cloud app to confirm it works consistently in both environments.</p>
 </div>
 </div>
 </div>
@@ -8195,7 +8194,7 @@ Periode: 1995-01-08 til 2026-09-06
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Bruk-av-AI">Bruk av AI<a class="anchor-link" href="#Bruk-av-AI">¶</a></h2><p>ChatGPT/Claude er brukt til hjelp med Python-kode (Pandas, Plotly, Streamlit), feilsøking og forklaringer underveis i prosjektet.</p>
+<h2 id="Use-of-AI">Use of AI<a class="anchor-link" href="#Use-of-AI">¶</a></h2><p>Claude (Anthropic) was used throughout the project to help with Python code (Pandas, Plotly, Streamlit), debugging error messages (including encoding issues in PowerShell), explaining Git/GitHub commands, and locating the correct source file (reservoirs.csv) in the course's GitHub repository.</p>
 </div>
 </div>
 </div>
