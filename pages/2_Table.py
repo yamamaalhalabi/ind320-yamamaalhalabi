@@ -1,14 +1,23 @@
-import streamlit as st
 import pandas as pd
+import requests
+import streamlit as st
 
-st.title("Page 2 - Table")
+BASE = "https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk"
 
-@st.cache_data
+st.title("Reservoir data: first month")
+
+
+@st.cache_data(ttl=3600)
 def load_data():
-    # Read weekly reservoir data and keep only the national ("NO") level
-    df = pd.read_csv("reservoirs.csv", parse_dates=["dato_Id"])
-    df = df[df["omrType"] == "NO"].copy()
-    df = df.sort_values("dato_Id")
+    """Download the full weekly history from the NVE API (cached for 1 hour)."""
+    resp = requests.get(f"{BASE}/HentOffentligData", timeout=30)
+    resp.raise_for_status()
+    df = pd.DataFrame(resp.json())
+
+    # The API returns dates as text, so convert them explicitly
+    df["dato_Id"] = pd.to_datetime(df["dato_Id"])
+
+    # Rename columns to English names, as in the notebook
     df = df.rename(columns={
         "dato_Id": "date",
         "fyllingsgrad": "fill_ratio",
@@ -17,25 +26,32 @@ def load_data():
         "fyllingsgrad_forrige_uke": "fill_ratio_prev_week",
         "endring_fyllingsgrad": "fill_ratio_change",
     })
-    df = df.set_index("date")
-    return df[["fill_ratio", "capacity_twh", "fill_twh",
-                "fill_ratio_prev_week", "fill_ratio_change"]]
+    return df.sort_values("date")
 
-df = load_data()
 
-# Build one row per column, each with a sparkline of the first month's values
-first_month_end = df.index.min() + pd.DateOffset(months=1)
-first_month = df[df.index <= first_month_end]
+df_all = load_data()
 
-table_data = pd.DataFrame({
-    "column": df.columns,
-    "first_month": [first_month[col].tolist() for col in df.columns],
-})
+# Radio buttons: choose the type of area (national, price areas, watercourses)
+area_type = st.radio("Area type", ["NO", "EL", "VASS"], horizontal=True)
+df = df_all[df_all["omrType"] == area_type]
+
+# Keep only the first month of data for the chosen area type
+columns = ["fill_ratio", "capacity_twh", "fill_twh",
+           "fill_ratio_prev_week", "fill_ratio_change"]
+first_month = df[df["date"] < df["date"].min() + pd.DateOffset(months=1)]
+
+# One row per area number, one sparkline column per data column
+rows = []
+for area_nr, group in first_month.groupby("omrnr"):
+    row = {"area": f"{area_type} {area_nr}"}
+    for col in columns:
+        row[col] = group[col].tolist()
+    rows.append(row)
+table = pd.DataFrame(rows)
 
 st.dataframe(
-    table_data,
-    column_config={
-        "first_month": st.column_config.LineChartColumn("First month", width="medium"),
-    },
+    table,
+    column_config={col: st.column_config.LineChartColumn(col) for col in columns},
     hide_index=True,
+    use_container_width=True,
 )
