@@ -1,14 +1,24 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import requests
+import streamlit as st
 
-st.title("Page 3 - Plot")
+BASE = "https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk"
 
-@st.cache_data
+st.title("Reservoir fill levels (NVE)")
+
+
+@st.cache_data(ttl=3600)
 def load_data():
-    df = pd.read_csv("reservoirs.csv", parse_dates=["dato_Id"])
-    df = df[df["omrType"] == "NO"].copy()
-    df = df.sort_values("dato_Id")
+    """Download the full weekly history from the NVE API (cached for 1 hour)."""
+    resp = requests.get(f"{BASE}/HentOffentligData", timeout=30)
+    resp.raise_for_status()
+    df = pd.DataFrame(resp.json())
+
+    # The API returns dates as text, so convert them explicitly
+    df["dato_Id"] = pd.to_datetime(df["dato_Id"])
+
+    # Rename columns to English names, as in the notebook
     df = df.rename(columns={
         "dato_Id": "date",
         "fyllingsgrad": "fill_ratio",
@@ -17,32 +27,35 @@ def load_data():
         "fyllingsgrad_forrige_uke": "fill_ratio_prev_week",
         "endring_fyllingsgrad": "fill_ratio_change",
     })
-    df = df.set_index("date")
-    return df[["fill_ratio", "capacity_twh", "fill_twh",
-                "fill_ratio_prev_week", "fill_ratio_change"]]
+    return df.sort_values("date")
 
-df = load_data()
 
-# One label per month present in the data, used by the slider
-months = df.index.to_period("M").unique()
-month_labels = [str(m) for m in months]
+df_all = load_data()
 
-column_choice = st.selectbox("Select column", options=["All"] + list(df.columns))
+# Radio buttons: choose the type of area (national, price areas, watercourses)
+area_type = st.radio("Area type", ["NO", "EL", "VASS"], horizontal=True)
 
-start_label, end_label = st.select_slider(
-    "Select period (months)",
-    options=month_labels,
-    value=(month_labels[0], month_labels[0]),
+# Select box: choose which column to plot
+columns = ["fill_ratio", "capacity_twh", "fill_twh",
+           "fill_ratio_prev_week", "fill_ratio_change"]
+column = st.selectbox("Column", columns)
+
+# Slider: choose the time interval (years) that is used for the data
+years = list(range(df_all["date"].dt.year.min(), df_all["date"].dt.year.max() + 1))
+start_year, end_year = st.select_slider(
+    "Time period (years)", options=years, value=(years[-10], years[-1])
 )
 
-start_time = pd.Period(start_label, freq="M").start_time
-end_time = pd.Period(end_label, freq="M").end_time
-subset = df.loc[start_time:end_time]
+# Keep only the chosen area type and time interval
+df = df_all[
+    (df_all["omrType"] == area_type)
+    & (df_all["date"].dt.year >= start_year)
+    & (df_all["date"].dt.year <= end_year)
+].copy()
 
-if column_choice == "All":
-    fig = px.line(subset, x=subset.index, y=subset.columns, title="Reservoir data - all columns")
-else:
-    fig = px.line(subset, x=subset.index, y=column_choice, title=f"Reservoir data - {column_choice}")
+# One line per area number (e.g. NO 1 ... NO 5 for EL)
+df["area"] = df["omrnr"].astype(str)
 
-fig.update_layout(xaxis_title="Date", yaxis_title="Value")
-st.plotly_chart(fig, width='stretch')
+fig = px.line(df, x="date", y=column, color="area",
+              title=f"{column} for {area_type}, {start_year}-{end_year}")
+st.plotly_chart(fig, use_container_width=True)
