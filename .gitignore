@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 notebooks/entsoe_cache/
-
-   *.html
-   entsoe_cache/
+entsoe_cache/
+data/
+*.html
+notebooks/*_files/
