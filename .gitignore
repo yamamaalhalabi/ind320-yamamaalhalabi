@@ -221,3 +221,4 @@ notebooks/entsoe_cache/
 
    *.html
    entsoe_cache/
+   data/shapefiles/
