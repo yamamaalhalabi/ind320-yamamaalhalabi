@@ -2,22 +2,32 @@ import streamlit as st
 
 st.title("IND320 - Data to decision")
 st.write(
-    "An app for Norwegian reservoir filling, electricity and weather data. "
-    "Use the menu on the left. The pages are grouped by the type of task."
+    "Explore Norwegian reservoir filling together with weather and power flow data, "
+    "and forecast the reservoir fill. Start on the map and pick an area."
 )
 
 col1, col2 = st.columns(2)
 with col1:
     st.subheader("Explore")
     st.markdown(
-        "- Reservoir table and plot\n"
-        "- ENTSO-E power flows"
+        """
+- **Map**: areas coloured by fill or weather
+- **Reservoir data**: weekly plot and overview
+- **ENTSO-E flows**: cross-border power flows
+"""
     )
 with col2:
-    st.subheader("Analysis")
+    st.subheader("Analysis and forecast")
     st.markdown(
-        "- STL decomposition and spectrogram of the filling degree\n"
-        "- Weather anomalies: SPC outliers and LOF"
+        """
+- **STL & spectrogram**: seasonality in the fill
+- **Weather anomalies**: SPC and LOF outliers
+- **Sliding window correlation**: weather vs reservoir fill
+- **River forecast**: online forecast with weather
+"""
     )
 
-st.info("Selections such as the area and the year are shared between the pages.")
+st.info(
+    "The area, year, weather property and time period you choose on the map "
+    "are shared between the pages."
+)
