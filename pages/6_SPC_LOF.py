@@ -16,8 +16,6 @@ import streamlit as st
 from scipy.fft import dct, idct
 from sklearn.neighbors import LocalOutlierFactor
 
-st.set_page_config(page_title="SPC and LOF", layout="wide")
-
 ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
 PRICE_AREA_URL = ("https://kart.nve.no/enterprise/rest/services/Nettomraader/"
                   "MapServer/0/query?where=1%3D1&outFields=*&f=geojson")
