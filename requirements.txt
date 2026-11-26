@@ -6,3 +6,5 @@ pymongo
 statsmodels
 scipy
 matplotlib
+geopandas
+scikit-learn 
