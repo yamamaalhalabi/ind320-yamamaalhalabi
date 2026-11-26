@@ -1,12 +1,17 @@
 import json
 import pathlib
+import sys
 
 import pandas as pd
 import plotly.express as px
 import requests
 import streamlit as st
 
-GEO_DIR = pathlib.Path(__file__).resolve().parent.parent / "geodata"
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+import weather_utils as wu  # noqa: E402
+
+GEO_DIR = ROOT / "geodata"
 BASE = "https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk"
 
 # Area type -> (GeoJSON file, default selection, omrType in the NVE API)
@@ -15,11 +20,13 @@ LAYERS = {
     "Price area": ("price_areas.geojson", "NO 3", "EL"),
     "Water area": ("water_areas.geojson", "VASS 1", "VASS"),
 }
+YEARS = list(range(2019, 2027))
 
 st.title("Map")
 
 st.session_state.setdefault("map_type", "Price area")
 st.session_state.setdefault("map_area", "NO 3")
+st.session_state.setdefault("weather_property", "Temperature (°C)")
 
 
 @st.cache_data
@@ -38,6 +45,11 @@ def load_fill():
     return df[["date", "omrType", "omrnr", "fyllingsgrad"]].rename(
         columns={"fyllingsgrad": "fill_ratio"}
     )
+
+
+@st.cache_data(show_spinner="Downloading weather data...", ttl=86400)
+def cached_weather(area_type, year):
+    return wu.load_area_weather(area_type, year)
 
 
 def area_label(omr_type, number):
@@ -60,7 +72,11 @@ if area_type != st.session_state["map_type"]:
     st.session_state["map_area"] = LAYERS[area_type][1]
     st.rerun()
 
-colour_by = st.radio("Colour by", ["Selection only", "Reservoir fill ratio"], horizontal=True)
+colour_by = st.radio(
+    "Colour by",
+    ["Selection only", "Reservoir fill ratio", "Weather property"],
+    horizontal=True,
+)
 
 filename, _, omr_type = LAYERS[area_type]
 geojson = load_geojson(filename)
@@ -89,6 +105,44 @@ if colour_by == "Reservoir fill ratio":
     week_df = fill[fill["date"].dt.date == week][["area", "fill_ratio"]]
     df = df.merge(week_df, on="area", how="left")
     params.update(color="fill_ratio", color_continuous_scale="Teal")
+
+elif colour_by == "Weather property":
+    col1, col2 = st.columns(2)
+    props = list(wu.WEATHER_PROPERTIES)
+    prop = col1.selectbox(
+        "Weather property", props, index=props.index(st.session_state["weather_property"])
+    )
+    year = col2.selectbox(
+        "Year", YEARS, index=YEARS.index(st.session_state.get("year", 2024))
+    )
+    st.session_state["weather_property"] = prop
+    st.session_state["year"] = year
+
+    try:
+        weather = cached_weather(area_type, year)
+    except Exception as exc:  # network problem, rate limit, ...
+        st.error(f"Could not download weather data: {exc}")
+        st.stop()
+
+    first, last = weather["date"].min().date(), weather["date"].max().date()
+    start, end = st.slider(
+        "Period", min_value=first, max_value=last, value=(first, last)
+    )
+    st.session_state["period"] = (start, end)
+
+    column = wu.WEATHER_PROPERTIES[prop]
+    period = weather[(weather["date"].dt.date >= start) & (weather["date"].dt.date <= end)]
+    # Precipitation is summed over the period, everything else is averaged
+    how = "sum" if column == "precipitation_sum" else "mean"
+    agg = period.groupby("area")[column].agg(how).rename("value").reset_index()
+    df = df.merge(agg, on="area", how="left")
+    label = f"{prop}, {'total' if how == 'sum' else 'mean'}"
+    params.update(
+        color="value",
+        color_continuous_scale="RdYlBu_r" if column == "temperature_2m_mean" else "Blues",
+        labels={"value": label},
+    )
+
 else:
     df["group"] = df["area"].eq(selected).map({True: "Selected", False: "Other"})
     params.update(
@@ -102,7 +156,7 @@ except AttributeError:  # older Plotly versions
     fig = px.choropleth_mapbox(df, mapbox_style="carto-positron", **params)
 
 fig.update_traces(marker_line_width=1.5, marker_line_color="#1F2933")
-if colour_by == "Reservoir fill ratio" and selected in names:
+if colour_by != "Selection only" and selected in names:
     # Highlight the selected area by fading the others
     fig.update_traces(
         selectedpoints=[names.index(selected)],
