@@ -222,3 +222,4 @@ entsoe_cache/
 data/
 *.html
 notebooks/*_files/
+weather_cache/
