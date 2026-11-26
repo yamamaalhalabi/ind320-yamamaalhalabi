@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 import geopandas as gpd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 import requests
@@ -143,17 +143,20 @@ def spc_outliers(weather, column, cutoff, n_std):
     is_outlier = (satv > upper) | (satv < lower)
 
     trend = series.to_numpy() - satv          # slow variation of the series
-    fig, ax = plt.subplots(figsize=(11, 5))
-    ax.plot(series.index, series, color="tab:blue", lw=0.8, label=column)
-    ax.plot(series.index, trend + upper, color="tab:orange", ls="--", label="SPC limits")
-    ax.plot(series.index, trend + lower, color="tab:orange", ls="--")
-    ax.scatter(series.index[is_outlier], series[is_outlier], color="red",
-               s=12, zorder=5, label="Outliers")
-    ax.set_title(f"SPC outliers: {column} (cutoff={cutoff}, {n_std} robust std)")
-    ax.set_xlabel("Time (UTC)")
-    ax.set_ylabel(column)
-    ax.legend()
-    fig.tight_layout()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=series.index, y=series, mode="lines", name=column,
+                             line=dict(color="#0F766E", width=1)))
+    fig.add_trace(go.Scatter(x=series.index, y=trend + upper, mode="lines", name="SPC limits",
+                             line=dict(color="#D97706", dash="dash", width=1)))
+    fig.add_trace(go.Scatter(x=series.index, y=trend + lower, mode="lines", name="Lower limit",
+                             line=dict(color="#D97706", dash="dash", width=1), showlegend=False))
+    fig.add_trace(go.Scatter(x=series.index[is_outlier], y=series[is_outlier], mode="markers",
+                             name="Outliers", marker=dict(color="red", size=6)))
+    fig.update_layout(
+        title=f"SPC outliers: {column} (cutoff={cutoff}, {n_std} robust std)",
+        xaxis_title="Time (UTC)", yaxis_title=column, height=480,
+        hovermode="x unified", margin=dict(t=60),
+    )
     return fig, {"n_points": len(series), "n_outliers": int(is_outlier.sum()),
                  "upper_limit_satv": float(upper), "lower_limit_satv": float(lower)}
 
@@ -164,15 +167,16 @@ def lof_outliers(weather, column, contamination, n_neighbors):
     lof = LocalOutlierFactor(n_neighbors=n_neighbors, contamination=contamination)
     is_outlier = lof.fit_predict(series.to_numpy().reshape(-1, 1)) == -1
 
-    fig, ax = plt.subplots(figsize=(11, 5))
-    ax.plot(series.index, series, color="tab:blue", lw=0.8, label=column)
-    ax.scatter(series.index[is_outlier], series[is_outlier], color="red",
-               s=12, zorder=5, label="Anomalies")
-    ax.set_title(f"LOF anomalies: {column} (proportion of outliers = {contamination:.1%})")
-    ax.set_xlabel("Time (UTC)")
-    ax.set_ylabel(column)
-    ax.legend()
-    fig.tight_layout()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=series.index, y=series, mode="lines", name=column,
+                             line=dict(color="#0F766E", width=1)))
+    fig.add_trace(go.Scatter(x=series.index[is_outlier], y=series[is_outlier], mode="markers",
+                             name="Anomalies", marker=dict(color="red", size=6)))
+    fig.update_layout(
+        title=f"LOF anomalies: {column} (proportion of outliers = {contamination:.1%})",
+        xaxis_title="Time (UTC)", yaxis_title=column, height=480,
+        hovermode="x unified", margin=dict(t=60),
+    )
     return fig, {"n_points": len(series), "n_outliers": int(is_outlier.sum()),
                  "contamination": contamination}
 
@@ -223,7 +227,7 @@ with tab_spc:
     cutoff = c2.slider("DCT cutoff (coefficients removed)", 1, 200, 20)
     n_std = c3.slider("Number of robust standard deviations", 1.0, 6.0, 3.0, 0.5)
     fig, summary = spc_outliers(weather, spc_col, cutoff, n_std)
-    st.pyplot(fig)
+    st.plotly_chart(fig, use_container_width=True)
     m1, m2, m3 = st.columns(3)
     m1.metric("Outliers", summary["n_outliers"])
     m2.metric("Upper limit (SATV)", f"{summary['upper_limit_satv']:.2f}")
@@ -236,5 +240,5 @@ with tab_lof:
     contamination = c2.slider("Proportion of outliers (%)", 0.1, 10.0, 1.0, 0.1) / 100
     n_neighbors = c3.slider("Number of neighbours", 5, 100, 20)
     fig, summary = lof_outliers(weather, lof_col, contamination, n_neighbors)
-    st.pyplot(fig)
+    st.plotly_chart(fig, use_container_width=True)
     st.metric("Anomalies", summary["n_outliers"])
