@@ -3,7 +3,6 @@ import plotly.express as px
 import streamlit as st
 from pymongo import MongoClient
 
-st.set_page_config(page_title="ENTSO-E flows", page_icon="⚡", layout="wide")
 st.title("Cross-border electricity flows")
 
 

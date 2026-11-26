@@ -8,3 +8,5 @@ scipy
 matplotlib
 geopandas
 scikit-learn 
+river
+shapely
