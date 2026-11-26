@@ -21,6 +21,7 @@ pages = {
     "Analysis": [
         st.Page("pages/5_STL_Spectrogram.py", title="STL & spectrogram", icon=":material/graphic_eq:"),
         st.Page("pages/6_SPC_LOF.py", title="Weather anomalies", icon=":material/thunderstorm:"),
+        st.Page("pages/8_Correlation.py", title="Sliding window correlation", icon=":material/query_stats:"),
     ],
     "Info": [
         st.Page("pages/9_About.py", title="About", icon=":material/info:"),
