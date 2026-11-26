@@ -14,8 +14,7 @@ pages = {
     ],
     "Explore": [
         st.Page("pages/7_Map.py", title="Map", icon=":material/map:"),
-        st.Page("pages/2_Table.py", title="Reservoir table", icon=":material/table_chart:"),
-        st.Page("pages/3_Plot.py", title="Reservoir plot", icon=":material/show_chart:"),
+        st.Page("pages/3_Plot.py", title="Reservoir data", icon=":material/show_chart:"),
         st.Page("pages/4_ENTSOE.py", title="ENTSO-E flows", icon=":material/bolt:"),
     ],
     "Analysis": [
