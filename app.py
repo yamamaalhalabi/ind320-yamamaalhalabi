@@ -23,6 +23,9 @@ pages = {
         st.Page("pages/6_SPC_LOF.py", title="Weather anomalies", icon=":material/thunderstorm:"),
         st.Page("pages/8_Correlation.py", title="Sliding window correlation", icon=":material/query_stats:"),
     ],
+    "Forecast": [
+        st.Page("pages/10_Forecast.py", title="River forecast", icon=":material/trending_up:"),
+    ],
     "Info": [
         st.Page("pages/9_About.py", title="About", icon=":material/info:"),
     ],
