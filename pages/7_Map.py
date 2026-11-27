@@ -2,6 +2,7 @@ import json
 import pathlib
 import sys
 
+import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
 import requests
@@ -163,6 +164,23 @@ if colour_by != "Selection only" and selected in names:
         selected={"marker": {"opacity": 1.0}},
         unselected={"marker": {"opacity": 0.4}},
     )
+    # Thick outline around the selected area (transparent fill, so the colours stay visible)
+if selected in names:
+    overlay_args = dict(
+        geojson=geojson,
+        locations=[selected],
+        z=[1],
+        featureidkey="properties.area",
+        colorscale=[[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]],
+        showscale=False,
+        marker=dict(line=dict(width=4, color="#0F766E")),
+        hoverinfo="skip",
+        name="Selected",
+    )
+    try:
+        fig.add_trace(go.Choroplethmap(**overlay_args))
+    except AttributeError:  # older Plotly versions
+        fig.add_trace(go.Choroplethmapbox(**overlay_args))
 fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=False)
 
 event = st.plotly_chart(fig, on_select="rerun", key="map_chart", use_container_width=True)

@@ -69,14 +69,19 @@ with st.form("settings"):
     if "period" in st.session_state:
         start, end = st.session_state["period"]
         use_map_period = st.checkbox(
-            f"Start the forecast at the end of the map period ({end})", value=True
+            f"Forecast the map period ({start} to {end}): train before it, forecast through it",
+            value=True,
         )
     submitted = st.form_submit_button("Run forecast", type="primary")
 
 # --- Training cut-off -------------------------------------------------------
 cutoff = series.index.max()
 if use_map_period:
-    cutoff = min(cutoff, pd.Timestamp(st.session_state["period"][1]))
+    map_start, map_end = st.session_state["period"]
+    cutoff = min(cutoff, pd.Timestamp(map_start))
+    # The horizon follows the length of the map period (in weeks)
+    horizon = int(max(1, min(52, -(-(map_end - map_start).days // 7))))
+    st.caption(f"Training data ends {cutoff.date()}; forecast horizon {horizon} weeks (from the map period).")
 train = series[series.index <= cutoff]
 if len(train) < 30:
     st.error("Too little data before the chosen start date.")
