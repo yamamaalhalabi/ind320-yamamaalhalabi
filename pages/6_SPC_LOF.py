@@ -191,10 +191,28 @@ st.write(
     "electricity area EL n corresponds to price area NOn."
 )
 
+AREAS = [f"NO {i}" for i in range(1, 6)]
+YEARS = list(range(2024, 2018, -1))
+
+# Area and year are shared with the other pages through session state
+area_default = st.session_state.get("area", "NO 3")
+if area_default not in AREAS:
+    area_default = "NO 3"
+year_default = st.session_state.get("year", 2024)
+if year_default not in YEARS:
+    year_default = 2024
+
 col_area, col_year = st.columns(2)
-el_number = col_area.selectbox("Electricity area (EL)", [1, 2, 3, 4, 5], index=2)
-year = col_year.selectbox("Year", list(range(2024, 2018, -1)))
-area_name = f"NO {el_number}"
+area_name = col_area.selectbox("Price area", AREAS, index=AREAS.index(area_default))
+year = col_year.selectbox("Year", YEARS, index=YEARS.index(year_default))
+st.session_state["area"] = area_name
+st.session_state["year"] = year
+
+# Default variable follows the weather property chosen elsewhere (temperature by default)
+var_names = list(WEATHER_VARS)
+default_var = 0
+if "precip" in st.session_state.get("weather_property", "").lower():
+    default_var = next((i for i, v in enumerate(var_names) if "precip" in v), 0)
 start, end = f"{year}-01-01", f"{year}-12-31"
 state_key = f"weather_{area_name}_{year}"
 
@@ -223,7 +241,7 @@ tab_spc, tab_lof = st.tabs(["SPC outliers", "LOF anomalies"])
 with tab_spc:
     st.subheader(f"SPC outliers, {area_name}, {year}")
     c1, c2, c3 = st.columns(3)
-    spc_col = c1.selectbox("Variable", WEATHER_VARS, index=0, key="spc_col")
+    spc_col = c1.selectbox("Variable", WEATHER_VARS, index=default_var, key="spc_col")
     cutoff = c2.slider("DCT cutoff (coefficients removed)", 1, 200, 20)
     n_std = c3.slider("Number of robust standard deviations", 1.0, 6.0, 3.0, 0.5)
     fig, summary = spc_outliers(weather, spc_col, cutoff, n_std)
@@ -236,7 +254,7 @@ with tab_spc:
 with tab_lof:
     st.subheader(f"LOF anomalies, {area_name}, {year}")
     c1, c2, c3 = st.columns(3)
-    lof_col = c1.selectbox("Variable", WEATHER_VARS, index=1, key="lof_col")
+    lof_col = c1.selectbox("Variable", WEATHER_VARS, index=default_var, key="lof_col")
     contamination = c2.slider("Proportion of outliers (%)", 0.1, 10.0, 1.0, 0.1) / 100
     n_neighbors = c3.slider("Number of neighbours", 5, 100, 20)
     fig, summary = lof_outliers(weather, lof_col, contamination, n_neighbors)
